@@ -1,0 +1,64 @@
+# docker-compose.yml — Run the entire app with one command: docker-compose up
+#
+# Services defined here:
+#   backend   — FastAPI Python app
+#   frontend  — React app (served by Vite in dev, Nginx in prod)
+#   db        — PostgreSQL (upgrade from SQLite when you're ready)
+#
+# For now (dev), you probably won't use Docker — just run backend and frontend separately.
+# But understanding this file is key for deployment.
+
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://linkdrop:linkdrop_pass@db:5432/linkdrop
+      - SECRET_KEY=change-this-to-a-real-secret-in-production
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app      # hot reload in dev
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules   # don't overwrite container's node_modules with host's
+    command: npm run dev -- --host
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: linkdrop
+      POSTGRES_PASSWORD: linkdrop_pass
+      POSTGRES_DB: linkdrop
+    ports:
+      - "5432:5432"         # expose for local inspection (remove in prod)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data   # data persists between restarts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U linkdrop"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+
+# ─────────────────────────────────────────────────────────────────
+# For production, you'd add:
+#   - traefik: reverse proxy + HTTPS
+#   - No ports exposed on db (internal network only)
+#   - Secrets from environment (not hardcoded above)
+#   - frontend served by nginx (not vite dev server)
+# ─────────────────────────────────────────────────────────────────
