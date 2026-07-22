@@ -25,5 +25,5 @@ EXPOSE 7860
 # Add /app to the python path so imports resolve correctly
 ENV PYTHONPATH=/app
 
-# Start Uvicorn pointing to backend/app/main.py on port 7860
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "7860"]
+# Start Uvicorn pointing to backend/app/main.py, dynamically reading the PORT env variable (fallback to 8000)
+CMD uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8000}
