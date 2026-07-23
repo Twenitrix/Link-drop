@@ -16,8 +16,12 @@ from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./linkdrop.db")
 
+# Force using pg8000 pure-python driver for PostgreSQL connection
+if DATABASE_URL.startswith("postgresql://") or DATABASE_URL.startswith("postgres://"):
+    prefix = "postgresql://" if DATABASE_URL.startswith("postgresql://") else "postgres://"
+    DATABASE_URL = DATABASE_URL.replace(prefix, "postgresql+pg8000://", 1)
+
 # connect_args is SQLite-only (allows multiple threads to use one connection)
-# Remove it if you switch to PostgreSQL
 engine = create_engine(
     DATABASE_URL,
     connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
