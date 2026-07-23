@@ -25,10 +25,16 @@ if DATABASE_URL.startswith("postgresql://") or DATABASE_URL.startswith("postgres
     if "prepared_statement=" not in DATABASE_URL:
         DATABASE_URL += ("&" if "?" in DATABASE_URL else "?") + "prepared_statement=false"
 
-# connect_args is SQLite-only (allows multiple threads to use one connection)
+# Configure connection arguments (SSL for PostgreSQL, thread safety for SQLite)
+connect_args = {}
+if "sqlite" in DATABASE_URL:
+    connect_args["check_same_thread"] = False
+else:
+    connect_args["ssl_context"] = True
+
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
+    connect_args=connect_args
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
