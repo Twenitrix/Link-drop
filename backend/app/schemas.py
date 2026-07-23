@@ -71,6 +71,8 @@ class LinkCreate(BaseModel):
     """What we ACCEPT when creating a short link"""
     original_url: str
     title: Optional[str] = None
+    custom_code: Optional[str] = None
+    expires_at: Optional[datetime] = None
 
     @field_validator("original_url")
     @classmethod
@@ -88,5 +90,6 @@ class LinkOut(BaseModel):
     title: Optional[str]
     clicks: int
     created_at: datetime
+    expires_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}

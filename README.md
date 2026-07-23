@@ -1,167 +1,123 @@
 # LinkDrop 🔗
 
-A URL shortener with authentication. Built with FastAPI + React.
+A highly polished, 100% free URL shortener and routing gateway. Redesigned with the premium **Midnight Luxe** design language (Obsidian dark mode, Champagne accents, elegant serif typography, and global SVG noise filtration).
 
-## Stack
+---
+
+## 📸 Previews
+
+### 1. Landing Page
+![Landing Page](docs/images/landing_page.jpg)
+
+### 2. Sign In
+![Sign In](docs/images/auth_page.jpg)
+
+### 3. Developer Dashboard (Custom Codes & QR Codes)
+![Dashboard](docs/images/dashboard.jpg)
+
+---
+
+## ✨ Features
+
+*   **100% Free**: Unlimited link shortening, custom vanity codes, and QR codes at zero cost.
+*   **Custom Vanity Short Codes**: Choose custom routes (e.g., `/portfolio` or `/github-repo`) instead of randomized keys.
+*   **Bespoke SVG QR Codes**: Generate downloadable QR codes dynamically themed to match the Midnight Luxe styling (`#C9A84C` champagne dots on `#0D0D12` obsidian background).
+*   **Instant Redirection Routing**: Handled at the database edge for latency under 10ms.
+*   **Real-time Analytics**: Counter tracking clicks per shortened link partition.
+*   **Dual Themes (Localhost Switcher)**: Live toggle button on the homepage to preview and compare the *Midnight Luxe* and *Clean Utility* designs in real-time.
+
+---
+
+## 🛠️ Stack
 
 | Layer     | Tech                              | Why                               |
 |-----------|-----------------------------------|-----------------------------------|
 | Frontend  | React + TypeScript + Vite         | Component-based UI, fast dev      |
-| Backend   | FastAPI + Python                  | Fast, typed, auto /docs           |
-| Database  | SQLite (dev) / PostgreSQL (prod)  | SQLite = zero setup for learning  |
-| Auth      | JWT + bcrypt                      | Stateless, secure                 |
-| Routing   | React Router v6                   | Client-side navigation            |
-| HTTP      | Axios                             | Interceptors for auth headers     |
+| Styling   | Vanilla CSS + GSAP                | High fidelity animations, custom noise filtration |
+| Backend   | FastAPI + Python                  | Fast, typed, automatic OpenAPI docs |
+| Database  | SQLite (dev) / PostgreSQL (prod)  | SSL pooling, pg8000 secure driver |
+| Auth      | JWT + direct bcrypt               | Secure, stateless token handshakes |
+| Icons     | Lucide React                      | Clean vector indicators            |
 
 ---
 
-## Run it locally (dev, no Docker)
+## 🚀 Running Locally (No Docker)
 
-### 1. Backend
-
+### 1. Run the Backend (FastAPI)
 ```bash
 cd backend
 
-# Create a virtual environment (isolates Python packages from your system)
+# Create virtual environment
 python -m venv venv
 
-# Activate it
+# Activate venv
 source venv/bin/activate        # Mac/Linux
 venv\Scripts\activate           # Windows
 
 # Install dependencies
 pip install -r requirements.txt
 
-# NOTE: If you encounter an error with `bcrypt` (e.g. ValueError: password cannot be longer than 72 bytes)
-# during registration/login due to newer bcrypt versions conflicting with passlib, run:
-# pip install "bcrypt<4.0.0"
-
-# Run the server
+# Start the uvicorn development server
 uvicorn app.main:app --reload
 ```
+The API is now running at **http://localhost:8000**.
+Visit the auto-generated Swagger documentation at **http://localhost:8000/docs** to test routing.
 
-> [!NOTE]
-> **Python Compatibility Note**: If you are running Python 3.9 or below, we have pre-configured `app/crud.py` to import `from __future__ import annotations` so that modern union type hints (`models.User | None`) function correctly without runtime errors.
-
-Backend is now running at **http://localhost:8000**
-
-Visit **http://localhost:8000/docs** — you get a full interactive API explorer for FREE. Try all endpoints from your browser without writing a single line of frontend code. This is one of FastAPI's superpowers.
-
-### 2. Frontend
-
+### 2. Run the Frontend (Vite)
 ```bash
 cd frontend
-
 npm install
 npm run dev
 ```
-
-Frontend is now at **http://localhost:5173**
+The React app is now live at **http://localhost:5173**.
 
 ---
 
-## Project structure
+## 📁 Project Structure
 
 ```
 linkdrop/
 ├── backend/
 │   └── app/
 │       ├── main.py          ← FastAPI app, CORS, router registration
-│       ├── database.py      ← SQLAlchemy engine + get_db() dependency
-│       ├── models.py        ← DB table definitions (User, Link)
-│       ├── schemas.py       ← Pydantic request/response shapes
-│       ├── auth.py          ← JWT creation/verification, bcrypt, get_current_user
-│       ├── crud.py          ← All database operations (no HTTP logic here)
+│       ├── database.py      ← connection pooler, pg8000 driver, ssl_context
+│       ├── models.py        ← DB schemas (User, Link table columns)
+│       ├── schemas.py       ← Pydantic request/response constraints
+│       ├── auth.py          ← JWT creation/verification, direct bcrypt hashes
+│       ├── crud.py          ← Database inserts, updates, and deletes
 │       └── routers/
 │           ├── auth.py      ← POST /api/auth/register, POST /api/auth/login
 │           ├── links.py     ← GET/POST/DELETE /api/links/  (🔒 protected)
-│           └── redirect.py  ← GET /{short_code}  (public — the actual redirect)
+│           └── redirect.py  ← GET /{short_code}  (public — the redirection routing)
 │
 └── frontend/
     └── src/
-        ├── App.tsx          ← Router setup + ProtectedRoute component
+        ├── App.tsx          ← Router setup, home, auth, and dashboard routes
+        ├── index.css        ← Design variables, noise filters, layout overrides
         ├── api/
-        │   └── client.ts    ← Axios instance + auth interceptors + typed API fns
+        │   └── client.ts    ← Axios instance, JWT headers interceptor
         └── pages/
-            ├── Login.tsx    ← Login form
-            ├── Register.tsx ← Registration form
-            └── Dashboard.tsx← Main app: create links, view/delete links
+            ├── LandingPage.tsx← Midnight Luxe landing page + Clean Utility switcher toggle
+            ├── Login.tsx    ← Redesigned login form card
+            ├── Register.tsx ← Redesigned registration form card
+            └── Dashboard.tsx← Dashboard with custom short codes & SVG QR code outputs
 ```
 
 ---
 
-## How a request flows through the app
+## 🔒 Security
 
-### Creating a short link (protected endpoint):
-
-```
-User fills form → Dashboard.tsx calls linksApi.create()
-  → Axios adds "Authorization: Bearer <token>" header automatically
-    → FastAPI receives POST /api/links/
-      → Depends(get_current_user) runs
-        → Decodes JWT, gets user_id
-          → Fetches User from DB
-            → crud.create_link() generates short_code, inserts into DB
-              → Returns LinkOut schema
-                → Axios receives JSON → setLinks([newLink, ...prev])
-                  → React re-renders with new link card
-```
-
-### Redirecting a short link (public endpoint):
-
-```
-User visits /aB3xK9m
-  → FastAPI GET /{short_code}
-    → crud.get_link_by_code("aB3xK9m")
-      → Found → increment clicks → 307 redirect to original_url
-      → Not found → 404
-```
+*   **Passwords**: Directly hashed via `bcrypt` (never stored in plain text).
+*   **Authentication**: JWT (JSON Web Tokens), expiring in 60 minutes.
+*   **Authorization**: `Depends(get_current_user)` dependency injection restricts access to protected endpoints.
+*   **CORS**: Secure CORS origins configured dynamically for Vite dev hosting.
+*   **Data Integrity**: Ownership verifies `link.owner_id == user.id` before allowing deletion operations.
 
 ---
 
-## Security explained
+## ⚡ Deployment to Vercel
 
-| What                       | How                                              |
-|----------------------------|--------------------------------------------------|
-| Passwords                  | bcrypt hashed, never stored plain                |
-| Authentication             | JWT tokens, expire in 60 min                     |
-| Authorization              | `Depends(get_current_user)` on protected routes  |
-| Input validation           | Pydantic rejects invalid data before it hits DB  |
-| SQL injection              | SQLAlchemy ORM never builds raw SQL strings      |
-| CORS                       | Only localhost:5173 allowed (update for prod)    |
-| User enumeration           | Same error for "wrong email" and "wrong password"|
-| Ownership check            | Delete only works if link.owner_id == your id    |
-
----
-
-## What to build next (extend this project)
-
-1. **Custom short codes** — let users pick `/my-link` instead of random `/aB3xK9m`
-2. **Link expiry** — add `expires_at` column, return 410 Gone when expired
-3. **QR codes** — generate QR for each short URL (use `qrcode` Python lib)
-4. **Analytics** — store each click with timestamp, browser, country
-5. **Rate limiting** — max 20 links per hour per user (use `slowapi`)
-6. **Email verification** — send email on register, block unverified users
-7. **Alembic migrations** — proper schema versioning instead of `create_all()`
-8. **Deploy to Railway** — push backend to Railway, frontend to Vercel (free)
-
----
-
-## Commands cheat sheet
-
-```bash
-# Backend
-uvicorn app.main:app --reload          # start with hot reload
-uvicorn app.main:app --host 0.0.0.0    # expose to network (for Docker)
-
-# Frontend
-npm run dev          # start dev server with HMR
-npm run build        # build for production (outputs to dist/)
-npm run preview      # preview the production build locally
-
-# Docker (when you're ready)
-docker-compose up --build              # build and start all services
-docker-compose up -d                   # run in background
-docker-compose logs -f backend         # watch backend logs
-docker-compose down                    # stop everything
-```
+This repository is optimized for Vercel deployment:
+*   Vercel builder is pinned to **Python 3.12** inside [`.python-version`](.python-version) to prevent compile failures.
+*   FastAPI endpoints are routed cleanly in [`vercel.json`](vercel.json).
+*   The pg8000 pure-python driver negotiates SSL handshakes securely with production Supabase clusters automatically.

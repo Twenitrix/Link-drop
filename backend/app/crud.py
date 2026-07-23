@@ -53,20 +53,24 @@ def _generate_short_code(length: int = 7) -> str:
 
 
 def create_link(db: Session, link: schemas.LinkCreate, owner_id: int) -> models.Link:
-    # Keep generating codes until we find one that doesn't exist
-    # Collision is astronomically unlikely with 7 chars but we check anyway
-    for _ in range(10):  # max 10 attempts
-        code = _generate_short_code()
-        if not db.query(models.Link).filter(models.Link.short_code == code).first():
-            break
+    if link.custom_code:
+        code = link.custom_code
     else:
-        raise RuntimeError("Failed to generate unique short code")
+        # Keep generating codes until we find one that doesn't exist
+        # Collision is astronomically unlikely with 7 chars but we check anyway
+        for _ in range(10):  # max 10 attempts
+            code = _generate_short_code()
+            if not db.query(models.Link).filter(models.Link.short_code == code).first():
+                break
+        else:
+            raise RuntimeError("Failed to generate unique short code")
 
     db_link = models.Link(
         original_url=link.original_url,
         short_code=code,
         title=link.title,
         owner_id=owner_id,
+        expires_at=link.expires_at,
     )
     db.add(db_link)
     db.commit()

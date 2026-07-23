@@ -58,6 +58,7 @@ export interface Link {
   title: string | null;
   clicks: number;
   created_at: string;
+  expires_at?: string | null;
 }
 
 export interface Token {
@@ -79,7 +80,7 @@ export const linksApi = {
   getAll: () =>
     api.get<Link[]>("/api/links/"),
 
-  create: (data: { original_url: string; title?: string }) =>
+  create: (data: { original_url: string; title?: string; custom_code?: string; expires_at?: string | null }) =>
     api.post<Link>("/api/links/", data),
 
   delete: (id: number) =>

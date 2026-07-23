@@ -24,6 +24,29 @@ def create_link(
     current_user: models.User = Depends(get_current_user),  # 🔒 protected
 ):
     """Create a new short link. Requires valid JWT token."""
+    if link.custom_code:
+        # Validate custom code format
+        c_code = link.custom_code.strip()
+        if len(c_code) < 3:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Custom short code must be at least 3 characters"
+            )
+        if not c_code.replace("-", "").replace("_", "").isalnum():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Custom short code must contain only alphanumeric characters, dashes, or underscores"
+            )
+        
+        # Check collision
+        existing = crud.get_link_by_code(db, short_code=c_code)
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Custom short code is already taken"
+            )
+        link.custom_code = c_code
+
     return crud.create_link(db, link, owner_id=current_user.id)
 
 

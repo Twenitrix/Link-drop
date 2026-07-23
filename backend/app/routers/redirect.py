@@ -10,6 +10,7 @@
 # because /{short_code} is a wildcard route that would catch everything,
 # including /docs and /api/* if registered first.
 
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
@@ -34,6 +35,13 @@ def redirect_to_url(short_code: str, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Short link '{short_code}' not found or has been deleted"
+        )
+
+    # Check expiration
+    if link.expires_at and datetime.utcnow() > link.expires_at:
+        raise HTTPException(
+            status_code=status.HTTP_410_GONE,
+            detail=f"Short link '{short_code}' has expired"
         )
 
     # Increment click counter (fire and forget — we don't return the updated count)

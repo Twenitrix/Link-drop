@@ -8,6 +8,7 @@
 
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { Link2 } from "lucide-react";
 import { authApi } from "../api/client";
 
 export default function Login() {
@@ -36,10 +37,13 @@ export default function Login() {
 
   return (
     <div className="auth-page">
+      <div className="bg-noise"></div>
       <div className="auth-card">
-        <div className="auth-logo">🔗</div>
-        <h1>LinkDrop</h1>
-        <p className="auth-subtitle">Sign in to your account</p>
+        <Link to="/" style={{ textDecoration: 'none', color: 'inherit', display: 'block', textAlign: 'center' }}>
+          <div className="auth-logo"><Link2 size={36} /></div>
+          <h1>LinkDrop</h1>
+        </Link>
+        <p className="auth-subtitle" style={{ marginTop: '0.5rem' }}>Sign in to your account</p>
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="field">

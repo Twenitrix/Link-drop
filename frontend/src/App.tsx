@@ -14,6 +14,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import LandingPage from "./pages/LandingPage";
 
 // Simple auth check: does a token exist in localStorage?
 // The API client handles the case where the token is expired (auto-logout in interceptor)
@@ -33,10 +34,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Redirect root to dashboard or login */}
+        {/* Root landing page */}
         <Route
           path="/"
-          element={<Navigate to={isLoggedIn() ? "/dashboard" : "/login"} replace />}
+          element={<LandingPage />}
         />
 
         {/* Public routes */}

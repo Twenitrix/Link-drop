@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { Link2 } from "lucide-react";
 import { authApi } from "../api/client";
 
 export default function Register() {
@@ -39,10 +40,13 @@ export default function Register() {
 
   return (
     <div className="auth-page">
+      <div className="bg-noise"></div>
       <div className="auth-card">
-        <div className="auth-logo">🔗</div>
-        <h1>LinkDrop</h1>
-        <p className="auth-subtitle">Create your account</p>
+        <Link to="/" style={{ textDecoration: 'none', color: 'inherit', display: 'block', textAlign: 'center' }}>
+          <div className="auth-logo"><Link2 size={36} /></div>
+          <h1>LinkDrop</h1>
+        </Link>
+        <p className="auth-subtitle" style={{ marginTop: '0.5rem' }}>Create your account</p>
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="field">

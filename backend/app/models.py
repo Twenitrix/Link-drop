@@ -41,6 +41,7 @@ class Link(Base):
     title: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     clicks: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
     # ForeignKey links this row to a User row
     # If user is deleted, their links are deleted too (cascade on the User side)
