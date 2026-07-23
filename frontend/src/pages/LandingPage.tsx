@@ -7,9 +7,6 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const isLoggedIn = !!localStorage.getItem("access_token");
 
-  // State to toggle between Midnight Luxe and Clean Utility layouts
-  const [isCleanUtility, setIsCleanUtility] = useState(false);
-
   // State for Card 1: Diagnostic Shuffler (Midnight Luxe)
   const [shuffledCards, setShuffledCards] = useState([
     { id: 1, label: "Routing: Custom Alias", val: "/portfolio -> GH Page", status: "Active" },
@@ -31,16 +28,14 @@ export default function LandingPage() {
 
   // Card 1 Auto-Shuffling Logic
   useEffect(() => {
-    if (isCleanUtility) return;
     const timer = setInterval(() => {
       setShuffledCards((prev) => [prev[1], prev[2], prev[0]]);
     }, 3000);
     return () => clearInterval(timer);
-  }, [isCleanUtility]);
+  }, []);
 
   // Card 2 Typewriter Logic
   useEffect(() => {
-    if (isCleanUtility) return;
     let lineIdx = 0;
     let charIdx = 0;
     let currentLine = "";
@@ -75,12 +70,11 @@ export default function LandingPage() {
 
     typeTimer = setTimeout(tick, 500);
     return () => clearTimeout(typeTimer);
-  }, [isCleanUtility]);
+  }, []);
 
   // GSAP Entrance Animations
   const heroRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (isCleanUtility) return;
     const ctx = gsap.context(() => {
       gsap.from(".fade-up", {
         y: 40,
@@ -97,90 +91,8 @@ export default function LandingPage() {
       });
     }, heroRef);
     return () => ctx.revert();
-  }, [isCleanUtility]);
+  }, []);
 
-  // ── RENDER CLEAN UTILITY LAYOUT ─────────────────────────────────────────────
-  if (isCleanUtility) {
-    return (
-      <div className="landing-container clean-utility">
-        <div className="bg-noise"></div>
-
-        {/* Minimal Navbar */}
-        <nav className="navbar-simple">
-          <div className="nav-logo">
-            <Link2 className="nav-logo-icon" style={{ color: "var(--accent)" }} />
-            <span>LinkDrop</span>
-          </div>
-          <div className="nav-actions">
-            {isLoggedIn ? (
-              <button onClick={() => navigate("/dashboard")} className="btn-accent-nav">
-                Dashboard <ArrowRight size={14} />
-              </button>
-            ) : (
-              <>
-                <Link to="/login" className="btn-ghost-nav">Sign In</Link>
-                <Link to="/register" className="btn-accent-nav">Register</Link>
-              </>
-            )}
-          </div>
-        </nav>
-
-        {/* Direct shortening utility hero */}
-        <header className="utility-hero">
-          <span className="hero-tagline">MINIMAL ROUTING PROTOCOL</span>
-          <h1>Shorten links instantly.</h1>
-          <p>A fast, clean interface to redirect URLs and track link traffic metrics on the fly.</p>
-          
-          <div className="utility-shorten-box">
-            <input 
-              type="url" 
-              placeholder="Paste your long URL here (https://...)" 
-              className="utility-input" 
-              readOnly
-              onClick={() => navigate("/register")}
-            />
-            <button onClick={() => navigate("/register")} className="utility-btn">
-              Get Started <ArrowRight size={16} />
-            </button>
-          </div>
-          <span className="utility-hint">Free account required to save custom short codes and generate QR codes.</span>
-        </header>
-
-        {/* Clean minimal features */}
-        <section className="utility-features">
-          <div className="utility-feature">
-            <div className="utility-feature-icon"><Zap size={20} /></div>
-            <h3>Instant redirection</h3>
-            <p>Propagates immediately. Click links resolve globally in milliseconds.</p>
-          </div>
-          <div className="utility-feature">
-            <div className="utility-feature-icon"><Terminal size={20} /></div>
-            <h3>Custom short codes</h3>
-            <p>Replace generic identifiers with branded vanity aliases like /portfolio.</p>
-          </div>
-          <div className="utility-feature">
-            <div className="utility-feature-icon"><QrCode size={20} /></div>
-            <h3>Sleek QR Codes</h3>
-            <p>Generate styled QR codes instantly for digital and offline distribution.</p>
-          </div>
-        </section>
-
-        {/* Minimal Footer */}
-        <footer className="utility-footer">
-          <p>© {new Date().getFullYear()} LinkDrop. Clean and light link shortening.</p>
-        </footer>
-
-        {/* Layout Toggle Controller (Localhost only) */}
-        <div className="design-toggle-pill">
-          <button onClick={() => setIsCleanUtility(false)}>
-            ⇆ Switch to Midnight Luxe Layout
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ── RENDER MIDNIGHT LUXE LAYOUT ─────────────────────────────────────────────
   return (
     <div ref={heroRef} className="landing-container">
       {/* Global SVG Noise Overlay */}
@@ -453,6 +365,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
       {/* Footer */}
       <footer className="footer-section">
         <div className="footer-content">
@@ -493,13 +406,6 @@ export default function LandingPage() {
           <p>© {new Date().getFullYear()} LinkDrop. Built for the open-source web.</p>
         </div>
       </footer>
-
-      {/* Layout Toggle Controller (Localhost only) */}
-      <div className="design-toggle-pill">
-        <button onClick={() => setIsCleanUtility(true)}>
-          ⇆ Switch to Clean Utility Layout
-        </button>
-      </div>
     </div>
   );
 }
