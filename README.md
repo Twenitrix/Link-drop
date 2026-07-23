@@ -7,13 +7,13 @@ A highly polished, 100% free URL shortener and routing gateway. Redesigned with 
 ## 📸 Previews
 
 ### 1. Landing Page
-![Landing Page](docs/images/landing_page.jpg)
+![Landing Page](docs/images/landing_page.png)
 
 ### 2. Sign In
-![Sign In](docs/images/auth_page.jpg)
+![Sign In](docs/images/auth_page.png)
 
 ### 3. Developer Dashboard (Custom Codes & QR Codes)
-![Dashboard](docs/images/dashboard.jpg)
+![Dashboard](docs/images/dashboard.png)
 
 ---
 
