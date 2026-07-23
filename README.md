@@ -1,6 +1,6 @@
 # LinkDrop 🔗
 
-A highly polished, 100% free URL shortener and routing gateway. Redesigned with the premium **Midnight Luxe** design language (Obsidian dark mode, Champagne accents, elegant serif typography, and global SVG noise filtration).
+A highly polished, URL shortener and routing gateway. Redesigned with the premium **Midnight Luxe** design language (Obsidian dark mode, Champagne accents, elegant serif typography, and global SVG noise filtration).
 
 ---
 
@@ -19,7 +19,6 @@ A highly polished, 100% free URL shortener and routing gateway. Redesigned with 
 
 ## ✨ Features
 
-*   **100% Free**: Unlimited link shortening, custom vanity codes, and QR codes at zero cost.
 *   **Custom Vanity Short Codes**: Choose custom routes (e.g., `/portfolio` or `/github-repo`) instead of randomized keys.
 *   **Bespoke SVG QR Codes**: Generate downloadable QR codes dynamically themed to match the Midnight Luxe styling (`#C9A84C` champagne dots on `#0D0D12` obsidian background).
 *   **Instant Redirection Routing**: Handled at the database edge for latency under 10ms.
