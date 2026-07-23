@@ -20,6 +20,10 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./linkdrop.db")
 if DATABASE_URL.startswith("postgresql://") or DATABASE_URL.startswith("postgres://"):
     prefix = "postgresql://" if DATABASE_URL.startswith("postgresql://") else "postgres://"
     DATABASE_URL = DATABASE_URL.replace(prefix, "postgresql+pg8000://", 1)
+    
+    # Disable prepared statements for Transaction Pooler compatibility
+    if "prepared_statement=" not in DATABASE_URL:
+        DATABASE_URL += ("&" if "?" in DATABASE_URL else "?") + "prepared_statement=false"
 
 # connect_args is SQLite-only (allows multiple threads to use one connection)
 engine = create_engine(

@@ -21,7 +21,7 @@ import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
@@ -32,10 +32,6 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key-change-this-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-# CryptContext handles bcrypt hashing
-# bcrypt is slow ON PURPOSE — it makes brute-forcing password hashes infeasible
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 # This tells FastAPI that the token comes from the Authorization header
 # tokenUrl = where to get the token (for the auto-generated /docs UI)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
@@ -43,12 +39,16 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 def hash_password(password: str) -> str:
     """Turn 'mypassword123' into '$2b$12$...' (bcrypt hash)"""
-    return pwd_context.hash(password)
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
 
 
 def verify_password(plain: str, hashed: str) -> bool:
     """Check if a plain password matches a stored bcrypt hash"""
-    return pwd_context.verify(plain, hashed)
+    try:
+        return bcrypt.checkpw(plain.encode('utf-8'), hashed.encode('utf-8'))
+    except Exception:
+        return False
 
 
 def create_access_token(user_id: int, expires_delta: Optional[timedelta] = None) -> str:
